@@ -133,6 +133,11 @@ void show_pte(struct mm_struct *mm, unsigned long addr)
 { }
 #endif					/* CONFIG_MMU */
 
+int (*logme_kernel_fault) (struct mm_struct *mm, unsigned long addr, unsigned int fsr,
+		                                        struct pt_regs *regs);
+EXPORT_SYMBOL(logme_kernel_fault);
+
+
 /*
  * Oops.  The kernel tried to access some page that wasn't present.
  */
@@ -140,6 +145,9 @@ static void
 __do_kernel_fault(struct mm_struct *mm, unsigned long addr, unsigned int fsr,
 		  struct pt_regs *regs)
 {
+        if (logme_kernel_fault && !(*logme_kernel_fault)(mm, addr, fsr, regs))
+		return;
+
 	/*
 	 * Are we prepared to handle this kernel fault?
 	 */

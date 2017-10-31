@@ -311,6 +311,21 @@ static struct map_desc msm_8974_io_desc[] __initdata = {
 #ifdef CONFIG_DEBUG_MSM8974_UART
 	MSM_DEVICE(DEBUG_UART),
 #endif
+	//Hardcoding the MMIO page containing some of the msm cpp registers (phy_addr_start: 0xfda04000, size: 0x100)
+	//The first one is returned by ioremap and is the one we intercept
+	{
+		.virtual =  (unsigned long) 0xF9017000,
+		.pfn =      __phys_to_pfn(0xfda04000),
+		.length =   SZ_4K,
+		.type =     MT_DEVICE,
+	},
+	//The second one is the one we use to emulate writes
+	{
+		.virtual =  (unsigned long) 0xF9717000,
+		.pfn =      __phys_to_pfn(0xfda04000),
+		.length =   SZ_4K,
+		.type =     MT_DEVICE,
+	},		
 };
 
 void __init msm_map_8974_io(void)
